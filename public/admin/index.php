@@ -1,3 +1,5 @@
+<?php require_once("../../resources/config.php") ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,6 +98,9 @@
                         <h1 class="page-header">
                             Dashboard <small>Statistics Overview</small>
                         </h1>
+
+                        <h2 class="text-center"><?php displayMessage() ?></h2>
+
                         <ol class="breadcrumb">
                             <li class="active">
                                 <i class="fa fa-dashboard"></i> Dashboard

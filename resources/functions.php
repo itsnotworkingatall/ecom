@@ -9,6 +9,34 @@ function redirect($location)
 
 }
 
+function setMessage($message)
+{
+
+    if (!empty($message)) {
+
+        $_SESSION['message'] = $message;
+
+    } else {
+
+        $message = "";
+
+    }
+}
+
+function displayMessage()
+{
+
+    if (isset($_SESSION['message'])) {
+
+        echo $_SESSION['message'];
+        unset($_SESSION['message']);
+
+    }
+
+}
+
+
+
 function query($sql)
 {
 
@@ -54,11 +82,13 @@ function fetch_array($result)
 function getProducts($categoryId)
 {
     $query = "SELECT * FROM products ";
+
     if ($categoryId != null) {
         $query .= "WHERE product_category_id = {$categoryId} ";
     }
 
     $query = query($query);
+
     confirm($query);
 
     //$productsQty = mysqli_num_rows($query);
@@ -72,8 +102,7 @@ function getProducts($categoryId)
                 <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $row['product_image']?>" alt=""></a>
                 <div class="caption">
                     <h4 class="pull-right">&#36;<?php echo $row['product_price']?></h4>
-                    <h4><a href="item.php?id={$row['product_id']}"><?php echo $row['product_title']?></a>
-                    </h4>
+                    <h4><a href="item.php?id={$row['product_id']}"><?php echo $row['product_title']?></a></h4>
                     <p><?php echo $row['product_short_description']?></p>
                     <a class="btn btn-primary" target="_blank" href="item.php?id=<?php echo $row['product_id']?>">Add to cart</a>
                 </div>
@@ -95,7 +124,6 @@ function getProductsForCategory($categoryId)
 
     //$productsQty = mysqli_num_rows($query);
 
-
     while ($row = fetch_array($query)) {
 
         ?>
@@ -106,7 +134,8 @@ function getProductsForCategory($categoryId)
                         <h3><?php echo $row['product_title']?></h3>
                         <p><?php echo $row['product_short_description']?></p>
                         <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="item.php?id=<?php echo $row['product_id']?>" class="btn btn-default">More Info</a>
+                            <a href="#" class="btn btn-primary">Buy Now!</a>
+                            <a href="item.php?id=<?php echo $row['product_id']?>" class="btn btn-default">More Info</a>
                         </p>
                     </div>
                 </div>
@@ -152,4 +181,35 @@ function getCategories()
 
     }
 
+}
+
+function loginUser()
+{
+
+    if (isset($_POST['submit'])) {
+
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        $username = escape_string($username);
+        $password = escape_string($password);
+
+        $query = "SELECT * FROM users WHERE user_name = '{$username}' AND user_password = '{$password}'";
+        $query = query($query);
+        confirm($query);
+
+        if (mysqli_num_rows($query) == 0) {
+
+            setMessage('<div class="alert alert-danger alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>Invalid username or password</div>');
+
+            redirect("login.php");
+
+        } else {
+
+            setMessage('<div class="alert alert-success alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>Welcome, ' . $username . '</div>');
+
+            redirect("admin");
+
+        }
+    }
 }

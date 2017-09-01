@@ -25,29 +25,11 @@
 
         <!-- Page Features -->
         <div class="row">
-        <?php
-            if (isset($_GET['id']) && $_GET['id'] != null) {
 
-                $categoryId = $_GET['id'];
-
-            } else {
-            ?>
-<!--
-                <div class='col-lg-12'>
-                    <div class='alert alert-warning'>
-                        <p>no category id specified, displaying all products.</p>
-                    </div>
-                </div>
--->
             <?php
                 $categoryId = 0;
-
-            }
-
-            getProducts($categoryId);
-
-
-        ?>
+                getProducts($categoryId);
+            ?>
 
         </div>
     </div>
