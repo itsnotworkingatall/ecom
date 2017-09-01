@@ -1,0 +1,4 @@
+CREATE DATABASE `ecom_db`;
+CREATE TABLE `ecom_db`.`categories` ( `cat_id` INT(11) NOT NULL AUTO_INCREMENT , `cat_title` VARCHAR(255) NOT NULL , PRIMARY KEY (`cat_id`)) ENGINE = InnoDB;
+INSERT INTO `categories` (`cat_id`, `cat_title`) VALUES (NULL, 'Category One'), (NULL, 'Category Two');
+CREATE TABLE `ecom_db`.`products` ( `product_id` INT(11) NOT NULL AUTO_INCREMENT ,  `product_title` VARCHAR(255) NOT NULL ,  `product_category_id` INT(11) NOT NULL ,  `product_price` FLOAT(11) NOT NULL ,  `product_description` VARCHAR(255) NOT NULL ,  `product_image` VARCHAR(255) NOT NULL ,    PRIMARY KEY  (`product_id`)) ENGINE = InnoDB;
