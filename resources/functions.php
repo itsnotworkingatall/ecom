@@ -95,7 +95,7 @@ function getCategories()
 
     ?>
 
-        <a href="category.php?id=<?php echo $row['cat_id'] ?>" class="list-group-item"><?php echo $row['cat_title'] ?></a>
+        <a href="category.php?id=<?php echo $row['cat_id']?>" class="list-group-item"><?php echo $row['cat_title']?></a>
 
     <?php
 
