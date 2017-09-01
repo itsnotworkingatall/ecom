@@ -18,7 +18,16 @@
 
                     <?php //include(TEMPLATE_FRONT . DS . "product_thumbnail.php") ?>
 
-                    <div><?php getProducts(0) ?></div>
+                    <div>
+
+                    <?php
+
+                        $categoryId = 0;
+                        getProducts($categoryId);
+
+                    ?>
+
+                    </div>
 
                 </div>
 
