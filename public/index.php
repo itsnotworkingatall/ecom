@@ -16,7 +16,11 @@
 
                 <div class="row">
 
-                    <?php //include(TEMPLATE_FRONT . DS . "product_thumbnail.php") ?>
+                    <h1>
+
+                        <?php //echo $_SESSION['product_1'] ?>
+
+                    </h1>
 
                     <div>
 
@@ -36,6 +40,7 @@
         </div>
 
     </div>
+
     <!-- /.container -->
 
 <?php include(TEMPLATE_FRONT . DS . "footer.php") ?>

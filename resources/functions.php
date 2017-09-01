@@ -9,10 +9,12 @@ function redirect($location)
 
 }
 
-function setMessage($message)
+function setMessage($type, $message)
 {
 
     if (!empty($message)) {
+
+        $message = '<div class="alert alert-' . $type . ' alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' . $message . '</div>';
 
         $_SESSION['message'] = $message;
 
@@ -21,6 +23,9 @@ function setMessage($message)
         $message = "";
 
     }
+
+
+
 }
 
 function displayMessage()
@@ -104,7 +109,7 @@ function getProducts($categoryId)
                     <h4 class="pull-right">&#36;<?php echo $row['product_price']?></h4>
                     <h4><a href="item.php?id={$row['product_id']}"><?php echo $row['product_title']?></a></h4>
                     <p><?php echo $row['product_short_description']?></p>
-                    <a class="btn btn-primary" target="_blank" href="item.php?id=<?php echo $row['product_id']?>">Add to cart</a>
+                    <a class="btn btn-primary" href="cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
                 </div>
             </div>
         </div>
@@ -200,16 +205,52 @@ function loginUser()
 
         if (mysqli_num_rows($query) == 0) {
 
-            setMessage('<div class="alert alert-danger alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>Invalid username or password</div>');
+            setMessage('warning', 'Invalid username or password');
 
             redirect("login.php");
 
         } else {
 
-            setMessage('<div class="alert alert-success alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>Welcome, ' . $username . '</div>');
+            setMessage('success', "Welcome, " . $username);
 
             redirect("admin");
 
         }
     }
+}
+
+
+
+function sendMessage()
+{
+
+    if (isset($_POST['submit'])) {
+        $mailTo  = "itsnotworkingatall@gmail.com";
+        $name    = $_POST['name'];
+        $email   = $_POST['email'];
+        $subject = $_POST['subject'];
+        $message = $_POST['message'];
+
+        $headers = "From: {$name} {$email}";
+
+        $result = mail($mailTo, $subject, $message, $headers);
+
+        if (!$result) {
+
+            setMessage('danger', 'Could not send the email, sorry...');
+
+            redirect("contact.php");
+
+
+        } else {
+
+            setMessage('success', 'Email sent successfully');
+
+            redirect("contact.php");
+
+        }
+
+
+    }
+
 }
