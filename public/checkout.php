@@ -16,19 +16,7 @@
     <div class="row">
 
         <h1>Checkout</h1>
-        <h2>
-        <?php
 
-            if (isset($_SESSION['product_1'])) {
-
-                echo $_SESSION['product_1'];
-
-            }
-
-        ?>
-
-
-        </h2>
 
         <?php displayMessage() ?>
 
@@ -39,27 +27,16 @@
                         <th>Product</th>
                         <th>Price</th>
                         <th>Quantity</th>
-                        <th>Sub-total</th>
-                        <th></th>
-                        <th></th>
+                        <th>Subtotal</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>apple</td>
-                        <td>$23</td>
-                        <td>3</td>
-                        <td>2</td>
-                        <td><a href="cart.php?remove=1">Remove</a></td>
-                        <td><a href="cart.php?add=1">Add</a></td>
-                        <td><a href="cart.php?delete=1">Delete</a></td>
-                    </tr>
+                    <?php cart() ?>
+
                 </tbody>
             </table>
         </form>
-
-
 
         <!--  ***********CART TOTALS*************-->
 
@@ -71,18 +48,18 @@
             <tbody>
 
                 <tr class="cart-subtotal">
-                <th>Items:</th>
-                <td><span class="amount">4</span></td>
+                    <th>Items:</th>
+                    <td><span class="amount"><?php totals('allItemsQty') ?></span></td>
                 </tr>
 
                 <tr class="shipping">
-                <th>Shipping and Handling</th>
-                <td>Free Shipping</td>
+                    <th>Shipping and Handling</th>
+                    <td>Free Shipping</td>
                 </tr>
 
                 <tr class="order-total">
-                <th>Order Total</th>
-                <td><strong><span class="amount">$3444</span></strong> </td>
+                    <th>Order Total</th>
+                    <td><strong><span class="amount">&#36;<?php totals('total') ?></span></strong></td>
                 </tr>
 
             </tbody>

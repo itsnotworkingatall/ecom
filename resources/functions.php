@@ -221,11 +221,11 @@ function loginUser()
 
 
 
-function sendMessage()
+function sendMessage() //not tested))))
 {
 
     if (isset($_POST['submit'])) {
-        $mailTo  = "itsnotworkingatall@gmail.com";
+        $mailTo  = "*********************************@***********.com";
         $name    = $_POST['name'];
         $email   = $_POST['email'];
         $subject = $_POST['subject'];
@@ -252,5 +252,71 @@ function sendMessage()
 
 
     }
+
+}
+
+function cart()
+{
+    $total = 0;
+    $allItemsQty = 0;
+
+    foreach($_SESSION as $key => $value) {
+
+        if ($value > 0) {
+
+            if (substr($key, 0, 8) == "product_") {
+
+                $strlength = strlen($key - 8);
+                $id = substr($key, 8, $strlength);
+                $id = escape_string($id);
+
+                $query = "SELECT * FROM products WHERE product_id = $id";
+                $query = query($query);
+                confirm($query);
+
+                while ($row = fetch_array($query)) {
+
+                    $productId = $row['product_id'];
+                    $title = $row['product_title'];
+                    $price = $row['product_price'];
+                    $quantity = $value;
+                    $subtotal = $price * $quantity;
+
+                    $product = <<<CUT
+            <tr>
+                <td>{$title}</td>
+                <td>&#36;{$price}</td>
+                <td>{$quantity}</td>
+                <td>&#36;{$subtotal}</td>
+                <td><a class="btn btn-warning" href="cart.php?remove={$productId}"><span class="glyphicon glyphicon-minus"></span></a>
+                <a class="btn btn-success" href="cart.php?add={$productId}"><span class="glyphicon glyphicon-plus"></span></a>
+                <a class="btn btn-danger" href="cart.php?delete={$productId}"><span class="glyphicon glyphicon-remove"></span></a></td>
+            </tr>
+CUT;
+                    echo $product;
+
+                    $total += $subtotal;
+                    $allItemsQty += $quantity;
+
+                }
+            }
+        }
+
+    }
+
+$_SESSION['total'] = $total;
+$_SESSION['allItemsQty'] = $allItemsQty;
+
+echo "<pre>";
+var_dump($_SESSION);
+echo "</pre>";
+
+}
+
+function totals($key)
+{
+
+    isset($_SESSION[$key]) ? $_SESSION[$key] : $_SESSION[$key] = "";
+    echo $_SESSION[$key];
 
 }

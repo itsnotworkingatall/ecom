@@ -38,7 +38,9 @@ if (isset($_GET['remove'])) {
 
     if ($_SESSION['product_' . $_GET['remove']] < 1) {
 
-        setMessage('info', 'Your shopping cart is empty');
+        unset($_SESSION['product_' . $_GET['remove']]);
+
+        setMessage('info', 'Product removed.');
 
 
     }
@@ -49,13 +51,8 @@ if (isset($_GET['remove'])) {
 
 if (isset($_GET['delete'])) {
 
-    $_SESSION['product_' . $_GET['delete']] = '0';
+    unset($_SESSION['product_' . $_GET['delete']]);
 
-    if ($_SESSION['product_' . $_GET['remove']] < 1) {
-
-        //setMessage('info', 'Your shopping cart is empty');
-        redirect("checkout.php");
-
-    }
+    redirect("checkout.php");
 
 }
