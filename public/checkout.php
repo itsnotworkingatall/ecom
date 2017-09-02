@@ -17,25 +17,30 @@
 
         <h1>Checkout</h1>
 
-
         <?php displayMessage() ?>
 
-        <form action="">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php cart() ?>
+        <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+            <input type="hidden" name="cmd" value="_cart">
+            <input type="hidden" name="business" value="pryzmaby@gmail.com">
+            <input type="hidden" name="currency_code" value="US">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php cart() ?>
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+
+            <?php paypalButton() ?>
+
         </form>
 
         <!--  ***********CART TOTALS*************-->

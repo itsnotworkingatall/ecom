@@ -107,7 +107,7 @@ function getProducts($categoryId)
                 <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $row['product_image']?>" alt=""></a>
                 <div class="caption">
                     <h4 class="pull-right">&#36;<?php echo $row['product_price']?></h4>
-                    <h4><a href="item.php?id={$row['product_id']}"><?php echo $row['product_title']?></a></h4>
+                    <h4><a href="item.php?id=<?php echo $row['product_id']?>"><?php echo $row['product_title']?></a></h4>
                     <p><?php echo $row['product_short_description']?></p>
                     <a class="btn btn-primary" href="cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
                 </div>
@@ -260,7 +260,13 @@ function cart()
     $total = 0;
     $allItemsQty = 0;
 
-    foreach($_SESSION as $key => $value) {
+    $item_name = 1;
+    $item_number = 1;
+    $amount = 1;
+    $qty = 1;
+
+
+    foreach ($_SESSION as $key => $value) {
 
         if ($value > 0) {
 
@@ -292,8 +298,18 @@ function cart()
                 <a class="btn btn-success" href="cart.php?add={$productId}"><span class="glyphicon glyphicon-plus"></span></a>
                 <a class="btn btn-danger" href="cart.php?delete={$productId}"><span class="glyphicon glyphicon-remove"></span></a></td>
             </tr>
+
+            <input type="hidden" name="item_name_{$item_name}" value="{$title}">
+            <input type="hidden" name="item_number_{$item_number}" value="{$productId}">
+            <input type="hidden" name="amount_{$amount}" value="{$price}">
+            <input type="hidden" name="quantity_{$qty}" value="{$quantity}">
 CUT;
                     echo $product;
+
+                    $item_name++;
+                    $item_number++;
+                    $amount++;
+                    $qty++;
 
                     $total += $subtotal;
                     $allItemsQty += $quantity;
@@ -304,12 +320,12 @@ CUT;
 
     }
 
-$_SESSION['total'] = $total;
-$_SESSION['allItemsQty'] = $allItemsQty;
+    $_SESSION['total'] = $total;
+    $_SESSION['allItemsQty'] = $allItemsQty;
 
-echo "<pre>";
-var_dump($_SESSION);
-echo "</pre>";
+    echo "<pre>";
+    var_dump($_SESSION);
+    echo "</pre>";
 
 }
 
@@ -319,4 +335,18 @@ function totals($key)
     isset($_SESSION[$key]) ? $_SESSION[$key] : $_SESSION[$key] = "";
     echo $_SESSION[$key];
 
+}
+
+function paypalButton()
+{
+    if (isset($_SESSION['allItemsQty']) && $_SESSION['allItemsQty'] > 0 ) {
+
+$button = <<<BUTTON
+<input type="image" name="upload"
+src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif"
+alt="PayPal - The safer, easier way to pay online">
+BUTTON;
+
+    echo $button;
+    }
 }
