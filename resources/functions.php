@@ -109,7 +109,7 @@ function getProducts($categoryId)
                     <h4 class="pull-right">&#36;<?php echo $row['product_price']?></h4>
                     <h4><a href="item.php?id=<?php echo $row['product_id']?>"><?php echo $row['product_title']?></a></h4>
                     <p><?php echo $row['product_short_description']?></p>
-                    <a class="btn btn-primary" href="cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
+                    <a class="btn btn-primary" href="../resources/cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
                 </div>
             </div>
         </div>
@@ -211,6 +211,8 @@ function loginUser()
 
         } else {
 
+            $_SESSION['username'] = $username;
+
             setMessage('success', "Welcome, " . $username);
 
             redirect("admin");
@@ -294,9 +296,9 @@ function cart()
                 <td>&#36;{$price}</td>
                 <td>{$quantity}</td>
                 <td>&#36;{$subtotal}</td>
-                <td><a class="btn btn-warning" href="cart.php?remove={$productId}"><span class="glyphicon glyphicon-minus"></span></a>
-                <a class="btn btn-success" href="cart.php?add={$productId}"><span class="glyphicon glyphicon-plus"></span></a>
-                <a class="btn btn-danger" href="cart.php?delete={$productId}"><span class="glyphicon glyphicon-remove"></span></a></td>
+                <td><a class="btn btn-warning" href="../resources/cart.php?remove={$productId}"><span class="glyphicon glyphicon-minus"></span></a>
+                <a class="btn btn-success" href="../resources/cart.php?add={$productId}"><span class="glyphicon glyphicon-plus"></span></a>
+                <a class="btn btn-danger" href="../resources/cart.php?delete={$productId}"><span class="glyphicon glyphicon-remove"></span></a></td>
             </tr>
 
             <input type="hidden" name="item_name_{$item_name}" value="{$title}">

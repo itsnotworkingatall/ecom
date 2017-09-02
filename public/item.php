@@ -64,7 +64,7 @@ if (isset($_GET['id'])) {
     <form action="">
         <div class="form-group">
 <!--            <input type="submit" class="btn btn-primary" value="ADD TO CART">-->
-            <a class="btn btn-primary" href="cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
+            <a class="btn btn-primary" href="../resources/cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
         </div>
     </form>
 

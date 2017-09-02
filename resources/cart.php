@@ -25,7 +25,7 @@ if (isset($_GET['add'])) {
 
         }
 
-        redirect('checkout.php');
+        redirect('../public/checkout.php');
 
     }
 
@@ -45,7 +45,7 @@ if (isset($_GET['remove'])) {
 
     }
 
-    redirect("checkout.php");
+    redirect("../public/checkout.php");
 
 }
 
@@ -53,6 +53,6 @@ if (isset($_GET['delete'])) {
 
     unset($_SESSION['product_' . $_GET['delete']]);
 
-    redirect("checkout.php");
+    redirect("../public/checkout.php");
 
 }

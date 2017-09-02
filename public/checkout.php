@@ -34,6 +34,8 @@
                         </tr>
                     </thead>
                     <tbody>
+
+                        <?php //cartUpdate() ?>
                         <?php cart() ?>
 
                     </tbody>
