@@ -40,6 +40,15 @@ function displayMessage()
 
 }
 
+function lastId()
+{
+
+    global $connection;
+
+    return mysqli_insert_id($connection);
+
+}
+
 
 
 function query($sql)
@@ -351,4 +360,87 @@ BUTTON;
 
     echo $button;
     }
+}
+
+
+function report()
+{
+
+    if (isset($_GET['tx'])) {
+
+        $amount = $_GET['amt']; // 64%2e95
+        $transaction = $_GET['tx']; // 1JH21726JM507562V
+        $status = $_GET['st']; // Completed
+        $currency = $_GET['cc']; // USD
+
+        $amount = escape_string($amount);
+        $transaction = escape_string($transaction);
+        $status = escape_string($status);
+        $currency = escape_string($currency);
+
+        $total = 0;
+        $allItemsQty = 0;
+
+        foreach ($_SESSION as $key => $value) {
+
+            if ($value > 0) {
+
+                if (substr($key, 0, 8) == "product_") {
+
+                    $strlength = strlen($key - 8);
+                    $id = substr($key, 8, $strlength);
+                    $id = escape_string($id);
+
+                    $sendOrdrer = "INSERT INTO orders (order_amount, order_transaction, order_status, order_currency) ";
+                    $sendOrdrer .= "VALUES ('{$amount}', '{$transaction}', '{$status}', '{$currency}')";
+
+                    $sendOrdrer = query($sendOrdrer);
+
+                    $lastId = lastId();
+
+                    confirm($sendOrdrer);
+
+                    $query = "SELECT * FROM products WHERE product_id = $id";
+                    $query = query($query);
+                    confirm($query);
+
+                    while ($row = fetch_array($query)) {
+
+                        $productId = $row['product_id'];
+                        $title = $row['product_title'];
+                        $price = $row['product_price'];
+                        $quantity = $value;
+                        $subtotal = $price * $quantity;
+
+
+                        $total += $subtotal;
+                        $allItemsQty += $quantity;
+
+                        $insertReport = "INSERT INTO reports (order_id, product_id, product_title, product_price, product_qty) ";
+                        $insertReport .= "VALUES ('{$lastId}', '{$productId}', '{$title}', '{$price}', '{$quantity}')";
+
+                        $insertReport = query($insertReport);
+                        confirm($insertReport);
+
+                    }
+                }
+            }
+
+        }
+
+        session_destroy();
+
+    } else {
+
+        redirect('index.php');
+
+    }
+
+    $_SESSION['total'] = $total;
+//    $_SESSION['allItemsQty'] = $allItemsQty;
+
+//    echo "<pre>";
+//    var_dump($_SESSION);
+//    echo "</pre>";
+
 }
