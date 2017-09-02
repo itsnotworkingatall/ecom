@@ -4,13 +4,9 @@
 
 if (isset($_GET['add'])) {
 
-//    $_SESSION['product_' . $_GET['add']] += 1;
-//
-//    redirect('index.php');
-
     $productId = escape_string($_GET['add']);
 
-    $query = "SELECT * FROM products WHERE product_id = {$productId}";
+    $query = "SELECT * FROM products WHERE product_id = {$productId}"; //getting product stock qty in some weird way
 
     $query = query($query);
 
@@ -30,6 +26,35 @@ if (isset($_GET['add'])) {
         }
 
         redirect('checkout.php');
+
+    }
+
+}
+
+
+if (isset($_GET['remove'])) {
+
+    $_SESSION['product_' . $_GET['remove']]--;
+
+    if ($_SESSION['product_' . $_GET['remove']] < 1) {
+
+        setMessage('info', 'Your shopping cart is empty');
+
+
+    }
+
+    redirect("checkout.php");
+
+}
+
+if (isset($_GET['delete'])) {
+
+    $_SESSION['product_' . $_GET['delete']] = '0';
+
+    if ($_SESSION['product_' . $_GET['remove']] < 1) {
+
+        //setMessage('info', 'Your shopping cart is empty');
+        redirect("checkout.php");
 
     }
 

@@ -16,6 +16,19 @@
     <div class="row">
 
         <h1>Checkout</h1>
+        <h2>
+        <?php
+
+            if (isset($_SESSION['product_1'])) {
+
+                echo $_SESSION['product_1'];
+
+            }
+
+        ?>
+
+
+        </h2>
 
         <?php displayMessage() ?>
 
@@ -27,6 +40,9 @@
                         <th>Price</th>
                         <th>Quantity</th>
                         <th>Sub-total</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,6 +51,9 @@
                         <td>$23</td>
                         <td>3</td>
                         <td>2</td>
+                        <td><a href="cart.php?remove=1">Remove</a></td>
+                        <td><a href="cart.php?add=1">Add</a></td>
+                        <td><a href="cart.php?delete=1">Delete</a></td>
                     </tr>
                 </tbody>
             </table>
