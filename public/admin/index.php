@@ -69,6 +69,12 @@
 
     }
 
+if (isset($_GET['edit_product'])) {
+
+    include(TEMPLATE_BACK . DS . "edit_product.php");
+
+}
+
 ?>
 
 <?php include(TEMPLATE_BACK . DS . "footer.php") ?>

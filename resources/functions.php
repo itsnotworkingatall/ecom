@@ -53,12 +53,12 @@ function query($sql)
 
 }
 
-function confirm($result)
+function confirm($query)
 {
 
     global $connection;
 
-    if (!$result) {
+    if (!$query) {
 
         die("Query failed: " . mysqli_error($connection));
 
@@ -87,6 +87,7 @@ function fetch_array($result)
 
 function getProducts($categoryId)
 {
+
     $query = "SELECT * FROM products ";
 
     if ($categoryId != null) {
@@ -102,15 +103,22 @@ function getProducts($categoryId)
 
     while ($row = fetch_array($query)) {
 
+        $image = $row['product_image'];
+
+        if (!preg_match("/http\:\/\//i", $image))
+        {
+            $image = "../resources/uploads/" . $image;
+        }
+
         ?>
         <div class="col-sm-6 col-lg-4 col-md-4">
             <div class="thumbnail">
-                <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $row['product_image']?>" alt=""></a>
+                <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $image ?>" alt=""></a>
                 <div class="caption">
                     <h4 class="pull-right">&#36;<?php echo $row['product_price']?></h4>
                     <h4><a href="item.php?id=<?php echo $row['product_id']?>"><?php echo $row['product_title']?></a></h4>
                     <p><?php echo $row['product_short_description']?></p>
-                    <a class="btn btn-primary" href="../resources/cart.php?add=<?php echo $row['product_id']?>">Add to cart</a>
+                    <a class="btn btn-primary" href="../resources/cart.php?add=<?php echo $row['product_id']?>">Add to cart!</a>
                 </div>
             </div>
         </div>
@@ -132,10 +140,17 @@ function getProductsForCategory($categoryId)
 
     while ($row = fetch_array($query)) {
 
+        $image = $row['product_image'];
+
+        if (!preg_match("/http\:\/\//i", $image))
+        {
+            $image = "../../resources/uploads/" . $image;
+        }
+
         ?>
             <div class="col-md-3 col-sm-6 hero-feature">
                 <div class="thumbnail">
-                    <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $row['product_image']?>" alt=""></a>
+                    <a href="item.php?id=<?php echo $row['product_id']?>"><img src="<?php echo $image ?>" alt=""></a>
                     <div class="caption">
                         <h3><?php echo $row['product_title']?></h3>
                         <p><?php echo $row['product_short_description']?></p>
@@ -291,6 +306,7 @@ function cart()
                     $quantity = $value;
                     $subtotal = $price * $quantity;
 
+
                     $product = <<<CUT
             <tr>
                 <td>{$title}</td>
@@ -332,6 +348,10 @@ CUT;
 
 }
 
+/**
+ * @param $key
+ * @echo string
+ */
 function totals($key)
 {
 
@@ -340,6 +360,9 @@ function totals($key)
 
 }
 
+/**
+ * @echo paypal button
+ */
 function paypalButton()
 {
     if (isset($_SESSION['allItemsQty']) && $_SESSION['allItemsQty'] > 0 ) {
@@ -449,6 +472,7 @@ function displayOrders()
     confirm($query);
 
     while ($row = fetch_array($query)) {
+        $template_path = TEMPLATES;
 
         $orders = <<<DELIMITER
 
@@ -459,7 +483,7 @@ function displayOrders()
     <td>{$row['order_currency']}</td>
     <td>{$row['order_status']}</td>
     <td>{$row['order_date']}</td>
-    <td><a class="btn btn-danger" href="../../resources/templates/back/delete_order.php?id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+    <td><a class="btn btn-danger" href="{$template_path}/back/delete_order.php?id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
 </tr>
 
 
@@ -468,5 +492,188 @@ DELIMITER;
         echo $orders;
 
     }
+
+}
+
+
+
+function displayProducts()
+{
+    $query = "SELECT * FROM products";
+
+    $query = query($query);
+
+    confirm($query);
+
+    while ($row = fetch_array($query)) {
+
+        $productStatus = getProductStatus($row['product_status']);
+
+        $categoryName = getCategoryNameById($row['product_category_id']);
+
+        $image = $row['product_image'];
+
+        if (!preg_match("/http\:\/\//i", $image))
+        {
+            $image = "../../resources/uploads/" . $image;
+        }
+
+        $template_path = TEMPLATES;
+
+        $product = <<<PRODUCT
+<tr>
+   <th>{$row['product_id']}</th>
+   <th>{$row['product_title']}</th>
+   <th><a href="index.php?edit_product&id={$row['product_id']}"><img src="{$image}" height="60px"></a></th>
+   <th>$categoryName</th>
+   <th>{$row['product_price']}</th>
+   <th>{$row['product_quantity']}</th>
+   <th>$productStatus</th>
+   <th><a class="btn btn-warning" href="index.php?edit_product&id={$row['product_id']}"><span class="glyphicon glyphicon-edit"></span></a></th>
+   <th><a class="btn btn-danger" href="{$template_path}/back/delete_product.php?id={$row['product_id']}"><span class="glyphicon glyphicon-remove"></span></a></th>
+</tr>
+
+PRODUCT;
+
+        echo $product;
+
+    }
+}
+
+/**
+ * @param boolean $bool
+ * @return string
+ */
+function getProductStatus($bool)
+{
+    if ($bool == 0) {
+
+        $status = "Draft";
+
+    } else {
+
+        $status = "Published";
+
+    }
+
+    return $status;
+}
+
+/**
+ * @param $string
+ * @return int
+ */
+function setProductStatus($string)
+{
+    if ($string == "Publish") {
+
+        $status = 1;
+
+    } else {
+
+        $status = 0;
+
+    }
+
+    return $status;
+}
+
+/******** add product ********/
+
+function addProduct()
+{
+
+    if (isset($_POST['publish'])) {
+
+        $product_title             = escape_string($_POST['product_title']);
+        $product_description       = escape_string($_POST['product_description']);
+        $product_short_description = escape_string($_POST['product_short_description']);
+        $product_price             = escape_string($_POST['product_price']);
+        $product_category          = escape_string($_POST['product_category']);
+        $product_quantity          = escape_string($_POST['product_quantity']);
+        $product_status            = escape_string($_POST['publish']);
+        $product_status            = setProductStatus($product_status);
+
+        $product_image       = $_FILES['file']['name'];
+        $image_temp_location = $_FILES['file']['tmp_name'];
+
+        move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $product_image);
+
+        $query  = "INSERT INTO products (";
+        $query .= "product_title, ";
+        $query .= "product_category_id, ";
+        $query .= "product_price, ";
+        $query .= "product_quantity, ";
+        $query .= "product_description, ";
+        $query .= "product_short_description, ";
+        $query .= "product_image, ";
+        $query .= "product_status ";
+        $query .= ") VALUES (";
+        $query .= "'{$product_title}', ";
+        $query .= "'{$product_category}', ";
+        $query .= "'{$product_price}', ";
+        $query .= "'{$product_quantity}', ";
+        $query .= "'{$product_description}', ";
+        $query .= "'{$product_short_description}', ";
+        $query .= "'{$product_image}', ";
+        $query .= "'{$product_status}' ";
+        $query .= ") ";
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "Product added successfully");
+        redirect("index.php?products");
+    }
+
+}
+
+/**
+ * @echo string
+ */
+function getCategoriesList()
+{
+    $query = "SELECT * FROM categories";
+    $query = query($query);
+    confirm($query);
+
+    while ($row = fetch_array($query)) {
+
+        $categoryId = $row['cat_id'];
+        $categoryTitle = $row['cat_title'];
+
+        $category = '<option value="' . $categoryId . '">' . $categoryTitle . '</option>';
+
+        echo $category;
+
+    }
+
+}
+
+
+/**
+ * receiving category id
+ * @param int $categoryId
+ *
+ * returning category title
+ * @return string
+ */
+function getCategoryNameById($categoryId)
+{
+
+    $cat_title = "Not found";
+
+    $catId = $categoryId;
+
+    $categoryName = "SELECT cat_title FROM categories WHERE cat_id = $catId";
+    $categoryName = query($categoryName);
+    confirm($categoryName);
+
+    while ($key = fetch_array($categoryName)) {
+
+        $cat_title = $key['cat_title'];
+
+    }
+
+    return $cat_title;
 
 }
