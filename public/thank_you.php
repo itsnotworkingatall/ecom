@@ -2,7 +2,7 @@
 <?php include(TEMPLATE_FRONT . DS . "header.php") ?>
 <?php include(TEMPLATE_FRONT . DS . "top_navigation.php") ?>
 
-<?php report() ?>
+<?php processTransaction() ?>
 
 <!-- Page Content -->
 <div class="container">

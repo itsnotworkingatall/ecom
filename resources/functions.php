@@ -11,21 +11,13 @@ function redirect($location)
 
 function setMessage($type, $message)
 {
-
     if (!empty($message)) {
 
         $message = '<div class="alert alert-' . $type . ' alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' . $message . '</div>';
 
         $_SESSION['message'] = $message;
 
-    } else {
-
-        $message = "";
-
     }
-
-
-
 }
 
 function displayMessage()
@@ -363,8 +355,10 @@ BUTTON;
 }
 
 
-function report()
+function processTransaction()
 {
+    $total = 0;
+    $allItemsQty = 0;
 
     if (isset($_GET['tx'])) {
 
@@ -378,8 +372,16 @@ function report()
         $status = escape_string($status);
         $currency = escape_string($currency);
 
-        $total = 0;
-        $allItemsQty = 0;
+
+
+        $sendOrdrer = "INSERT INTO orders (order_amount, order_transaction, order_status, order_currency, order_date) ";
+        $sendOrdrer .= "VALUES ('{$amount}', '{$transaction}', '{$status}', '{$currency}', now())";
+
+        $sendOrdrer = query($sendOrdrer);
+
+        $lastId = lastId();
+
+        confirm($sendOrdrer);
 
         foreach ($_SESSION as $key => $value) {
 
@@ -390,15 +392,6 @@ function report()
                     $strlength = strlen($key - 8);
                     $id = substr($key, 8, $strlength);
                     $id = escape_string($id);
-
-                    $sendOrdrer = "INSERT INTO orders (order_amount, order_transaction, order_status, order_currency) ";
-                    $sendOrdrer .= "VALUES ('{$amount}', '{$transaction}', '{$status}', '{$currency}')";
-
-                    $sendOrdrer = query($sendOrdrer);
-
-                    $lastId = lastId();
-
-                    confirm($sendOrdrer);
 
                     $query = "SELECT * FROM products WHERE product_id = $id";
                     $query = query($query);
@@ -442,5 +435,38 @@ function report()
 //    echo "<pre>";
 //    var_dump($_SESSION);
 //    echo "</pre>";
+
+}
+
+
+/*******************************************  BACKEND   ******************************************/
+
+function displayOrders()
+{
+
+    $query = "SELECT * FROM orders";
+    $query = query($query);
+    confirm($query);
+
+    while ($row = fetch_array($query)) {
+
+        $orders = <<<DELIMITER
+
+<tr>
+    <td>{$row['order_id']}</td>
+    <td>{$row['order_amount']}</td>
+    <td>{$row['order_transaction']}</td>
+    <td>{$row['order_currency']}</td>
+    <td>{$row['order_status']}</td>
+    <td>{$row['order_date']}</td>
+    <td><a class="btn btn-danger" href="../../resources/templates/back/delete_order.php?id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+</tr>
+
+
+DELIMITER;
+
+        echo $orders;
+
+    }
 
 }
