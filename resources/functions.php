@@ -399,8 +399,20 @@ function processTransaction()
 
 
 
-        $sendOrdrer = "INSERT INTO orders (order_amount, order_transaction, order_status, order_currency, order_date) ";
-        $sendOrdrer .= "VALUES ('{$amount}', '{$transaction}', '{$status}', '{$currency}', now())";
+        $sendOrdrer = <<<SQL
+INSERT INTO orders (order_amount
+                  , order_transaction
+                  , order_status
+                  , order_currency
+                  , order_date
+                   ) 
+            VALUES ('{$amount}'
+                  , '{$transaction}'
+                  , '{$status}'
+                  , '{$currency}'
+                  , now()
+                   ) 
+SQL;
 
         $sendOrdrer = query($sendOrdrer);
 
@@ -434,8 +446,23 @@ function processTransaction()
                         $total += $subtotal;
                         $allItemsQty += $quantity;
 
-                        $insertReport = "INSERT INTO reports (order_id, product_id, product_title, product_price, product_qty) ";
-                        $insertReport .= "VALUES ('{$lastId}', '{$productId}', '{$title}', '{$price}', '{$quantity}')";
+                        $insertReport = <<<SQL
+INSERT INTO reports (order_id
+                   , product_id
+                   , product_title
+                   , product_price
+                   , product_qty
+                    ) 
+             VALUES ('{$lastId}'
+                   , '{$productId}'
+                   , '{$title}'
+                   , '{$price}'
+                   , '{$quantity}'
+                    ) 
+SQL;
+
+
+
 
                         $insertReport = query($insertReport);
                         confirm($insertReport);
@@ -564,7 +591,7 @@ function getProductStatus($bool)
  */
 function setProductStatus($string)
 {
-    if ($string == "Publish") {
+    if ($string == "Publish" || $string == "Update") {
 
         $status = 1;
 
@@ -598,25 +625,28 @@ function addProduct()
 
         move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $product_image);
 
-        $query  = "INSERT INTO products (";
-        $query .= "product_title, ";
-        $query .= "product_category_id, ";
-        $query .= "product_price, ";
-        $query .= "product_quantity, ";
-        $query .= "product_description, ";
-        $query .= "product_short_description, ";
-        $query .= "product_image, ";
-        $query .= "product_status ";
-        $query .= ") VALUES (";
-        $query .= "'{$product_title}', ";
-        $query .= "'{$product_category}', ";
-        $query .= "'{$product_price}', ";
-        $query .= "'{$product_quantity}', ";
-        $query .= "'{$product_description}', ";
-        $query .= "'{$product_short_description}', ";
-        $query .= "'{$product_image}', ";
-        $query .= "'{$product_status}' ";
-        $query .= ") ";
+        $product_image = escape_string($product_image);
+
+        $query = <<<SQL
+INSERT INTO products (product_title
+                    , product_category_id
+                    , product_price
+                    , product_quantity
+                    , product_description
+                    , product_short_description
+                    , product_image
+                    , product_status
+                     ) 
+              VALUES ('{$product_title}'
+                    , '{$product_category}'
+                    , '{$product_price}'
+                    , '{$product_quantity}'
+                    , '{$product_description}'
+                    , '{$product_short_description}'
+                    , '{$product_image}'
+                    , '{$product_status}'
+                     ) 
+SQL;
 
         $query = query($query);
         confirm($query);
@@ -625,6 +655,52 @@ function addProduct()
     }
 
 }
+
+
+function updateProduct()
+{
+
+    if (isset($_POST['update'])) {
+
+        $product_id                = escape_string($_GET['id']);
+        $product_title             = escape_string($_POST['product_title']);
+        $product_description       = escape_string($_POST['product_description']);
+        $product_short_description = escape_string($_POST['product_short_description']);
+        $product_price             = escape_string($_POST['product_price']);
+        $product_category          = escape_string($_POST['product_category']);
+        $product_quantity          = escape_string($_POST['product_quantity']);
+        $product_status            = escape_string($_POST['update']);
+        $product_status            = setProductStatus($product_status);
+
+        $product_image       = $_FILES['file']['name'];
+        $image_temp_location = $_FILES['file']['tmp_name'];
+
+        move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $product_image);
+
+        $product_image = escape_string($product_image);
+
+        $query = <<<SQL
+UPDATE products SET product_title             = '{$product_title}'
+                  , product_category_id       = '{$product_category}'
+                  , product_price             = '{$product_price}'
+                  , product_quantity          = '{$product_quantity}'
+                  , product_description       = '{$product_description}'
+                  , product_short_description = '{$product_short_description}'
+                  , product_image             = '{$product_image}'
+                  , product_status            = '{$product_status}' 
+WHERE product_id = {$product_id}
+SQL;
+
+
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "Product updated successfully");
+        redirect("index.php?products");
+    }
+
+}
+
 
 /**
  * @echo string
@@ -659,6 +735,7 @@ function getCategoriesList()
 function getCategoryNameById($categoryId)
 {
 
+
     $cat_title = "Not found";
 
     $catId = $categoryId;
@@ -687,20 +764,28 @@ function getCategoryNameById($categoryId)
 function pathToImage($frontendOrBackend, $imageNameFromDb)
 {
 
-    if ($frontendOrBackend == "backend") {
+    if (!$imageNameFromDb == null) {
 
-        $frontendOrBackend = "../";
+        if ($frontendOrBackend == "backend") {
+
+            $frontendOrBackend = "../";
+
+        } else {
+
+            $frontendOrBackend = "";
+
+        }
+
+        if (!preg_match("/https?\:\/\//i", $imageNameFromDb)) {
+            $imageNameFromDb = $frontendOrBackend . "../resources/uploads/" . $imageNameFromDb;;
+        }
+
+        return $imageNameFromDb;
 
     } else {
 
-        $frontendOrBackend = "";
+        return $imageNameFromDb;
 
     }
-
-    if (!preg_match("/https?\:\/\//i", $imageNameFromDb))
-    {
-        $imageNameFromDb = $frontendOrBackend . "../resources/uploads/" . $imageNameFromDb;;
-    }
-
-    return $imageNameFromDb;
 }
+
