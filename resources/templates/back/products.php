@@ -14,7 +14,7 @@
         </tr>
         </thead>
         <tbody>
-        <?php displayProducts() ?>
+        <?php displayProductsGrid() ?>
         </tbody>
     </table>
 </div>

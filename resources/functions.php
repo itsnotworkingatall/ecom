@@ -85,7 +85,7 @@ function fetch_array($result)
 
 //get products
 
-function getProducts($categoryId)
+function getProducts($categoryId) // on frontend, for category and index.
 {
 
     $query = "SELECT * FROM products ";
@@ -105,10 +105,7 @@ function getProducts($categoryId)
 
         $image = $row['product_image'];
 
-        if (!preg_match("/http\:\/\//i", $image))
-        {
-            $image = "../resources/uploads/" . $image;
-        }
+        $image = pathToImage("frontend", $image);
 
         ?>
         <div class="col-sm-6 col-lg-4 col-md-4">
@@ -126,7 +123,7 @@ function getProducts($categoryId)
     }
 }
 
-function getProductsForCategory($categoryId)
+function getProductsForCategory($categoryId)  // NOT USED
 {
     $query = "SELECT * FROM products ";
     if ($categoryId != null) {
@@ -144,7 +141,7 @@ function getProductsForCategory($categoryId)
 
         if (!preg_match("/http\:\/\//i", $image))
         {
-            $image = "../../resources/uploads/" . $image;
+            $image = "../" . pathToImage($image);
         }
 
         ?>
@@ -303,13 +300,18 @@ function cart()
                     $productId = $row['product_id'];
                     $title = $row['product_title'];
                     $price = $row['product_price'];
+                    $image = $row['product_image'];
                     $quantity = $value;
                     $subtotal = $price * $quantity;
+
+                    $image = pathToImage("frontend", $image);
+
 
 
                     $product = <<<CUT
             <tr>
                 <td>{$title}</td>
+                <td><img src="{$image}" alt=""></td>
                 <td>&#36;{$price}</td>
                 <td>{$quantity}</td>
                 <td>&#36;{$subtotal}</td>
@@ -497,7 +499,7 @@ DELIMITER;
 
 
 
-function displayProducts()
+function displayProductsGrid() // backend: "view products" grid.
 {
     $query = "SELECT * FROM products";
 
@@ -513,10 +515,7 @@ function displayProducts()
 
         $image = $row['product_image'];
 
-        if (!preg_match("/http\:\/\//i", $image))
-        {
-            $image = "../../resources/uploads/" . $image;
-        }
+        $image = pathToImage("backend", $image);
 
         $template_path = TEMPLATES;
 
@@ -676,4 +675,32 @@ function getCategoryNameById($categoryId)
 
     return $cat_title;
 
+}
+
+/**
+ * gets a filename, returns a path to the file from the "public" folder
+ * e.g. ../resources/uploads/$imagefilename
+ * @param string $imageNameFromDb
+ * @param string $frontendOrBackend
+ * @return string
+ */
+function pathToImage($frontendOrBackend, $imageNameFromDb)
+{
+
+    if ($frontendOrBackend == "backend") {
+
+        $frontendOrBackend = "../";
+
+    } else {
+
+        $frontendOrBackend = "";
+
+    }
+
+    if (!preg_match("/https?\:\/\//i", $imageNameFromDb))
+    {
+        $imageNameFromDb = $frontendOrBackend . "../resources/uploads/" . $imageNameFromDb;;
+    }
+
+    return $imageNameFromDb;
 }

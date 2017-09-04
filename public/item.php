@@ -21,6 +21,10 @@ if (isset($_GET['id'])) {
 
     while ($row = fetch_array($query)) {
 
+    $image = $row['product_image'];
+
+    $image = pathToImage("frontend", $image);
+
 ?>
 
 <div class="col-md-9">
@@ -32,7 +36,7 @@ if (isset($_GET['id'])) {
     <div class="col-md-7">
 
 
-       <img class="img-responsive" src="<?php echo $row['product_image'] ?>" alt="">
+       <img class="img-responsive" src="<?php echo $image ?>" alt="">
 
     </div>
 
