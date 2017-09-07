@@ -56,7 +56,7 @@
 
             <select name="product_category" id="" class="form-control">
                 <option value="0">--- Select Category ---</option>
-                <?php getCategoriesList() ?>
+                <?php getCategoriesList($product_category) ?>
             </select>
         </div>
         <!-- Product Brands-->

@@ -2,7 +2,7 @@
     <p class="lead">Shop Name</p>
     <div class="list-group">
 
-        <?php getCategories() ?>
+        <?php getCategories(false) ?>
 
     </div>
 </div>

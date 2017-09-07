@@ -16,10 +16,14 @@
             </li>
 
             <li>
-                <a href="index.php?products"><i class="fa fa-fw fa-bar-chart-o"></i> View Products</a>
+                <a href="index.php?reports"><i class="fa fa-fw fa-line-chart"></i> View Reports</a>
+            </li>
+
+            <li>
+                <a href="index.php?products"><i class="fa fa-fw fa-cubes"></i> View Products</a>
             </li>
             <li>
-                <a href="index.php?add_product"><i class="fa fa-fw fa-table"></i> Add Product</a>
+                <a href="index.php?add_product"><i class="fa fa-fw fa-plus"></i> Add Product</a>
             </li>
 
             <li>

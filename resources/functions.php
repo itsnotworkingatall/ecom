@@ -83,6 +83,51 @@ function fetch_array($result)
 
 }
 
+
+function delete($entity, $entityId)
+{
+    switch ($entity) {
+
+        case "category":
+            $dbTable = "categories";
+            $columnName = "cat_id";
+            $redirectTo = "categories";
+            $entityName = "Category";
+            break;
+
+        case "product":
+            $dbTable = "products";
+            $columnName = "product_id";
+            $redirectTo = "products";
+            $entityName = "Product";
+            break;
+
+        case "order":
+            $dbTable = "orders";
+            $columnName = "oder_id";
+            $redirectTo = "orders";
+            $entityName = "Order";
+            break;
+    }
+
+        $query = "DELETE FROM {$dbTable} WHERE {$columnName} = $entityId ";
+
+        $query = query($query);
+
+    if (confirm($query)) {
+
+        setMessage("success",$entityName ." deleted.");
+
+    } else {
+
+        setMessage("warning",$entityName ." was not deleted.");
+
+    }
+
+    redirect("index.php?" . $redirectTo);
+
+}
+
 //get products
 
 function getProducts($categoryId) // on frontend, for category and index.
@@ -182,20 +227,42 @@ function productsCount($categoryId)
 
 }
 
-function getCategories()
+function getCategories($isbackend)
 {
 
     $query = "SELECT * FROM categories";
     $query = query($query);
     confirm($query);
 
-    while ($row = mysqli_fetch_array($query)) {
+    $template_path = TEMPLATES;
 
-    ?>
+    if ($isbackend == false) {
 
-        <a href="category.php?id=<?php echo $row['cat_id']?>" class="list-group-item"><?php echo $row['cat_title']?></a>
+        while ($row = mysqli_fetch_array($query)) {
 
-    <?php
+            ?>
+
+            <a href="category.php?id=<?php echo $row['cat_id']?>" class="list-group-item"><?php echo $row['cat_title']?></a>
+
+            <?php
+
+        }
+
+    } else {
+
+        while ($row = mysqli_fetch_array($query)) {
+
+            ?>
+
+            <tr>
+                <td><?php echo $row['cat_id']?></td>
+                <td><a href="index.php?edit_category&id=<?php echo $row['cat_id']?>" ><?php echo $row['cat_title']?></a></td>
+                <td><a class="btn btn-danger" href="<?php echo $template_path ?>/back/delete.php?entity=category&id=<?php echo $row['cat_id']?>"><span class="glyphicon glyphicon-remove"></span></a></td>
+            </tr>
+
+            <?php
+
+        }
 
     }
 
@@ -512,7 +579,7 @@ function displayOrders()
     <td>{$row['order_currency']}</td>
     <td>{$row['order_status']}</td>
     <td>{$row['order_date']}</td>
-    <td><a class="btn btn-danger" href="{$template_path}/back/delete_order.php?id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+    <td><a class="btn btn-danger" href="{$template_path}/back/delete.php?entity=order&id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
 </tr>
 
 
@@ -556,7 +623,7 @@ function displayProductsGrid() // backend: "view products" grid.
    <th>{$row['product_quantity']}</th>
    <th>$productStatus</th>
    <th><a class="btn btn-warning" href="index.php?edit_product&id={$row['product_id']}"><span class="glyphicon glyphicon-edit"></span></a></th>
-   <th><a class="btn btn-danger" href="{$template_path}/back/delete_product.php?id={$row['product_id']}"><span class="glyphicon glyphicon-remove"></span></a></th>
+   <th><a class="btn btn-danger" href="{$template_path}/back/delete.php?entity=product&id={$row['product_id']}"><span class="glyphicon glyphicon-remove"></span></a></th>
 </tr>
 
 PRODUCT;
@@ -675,6 +742,24 @@ function updateProduct()
         $product_image       = $_FILES['file']['name'];
         $image_temp_location = $_FILES['file']['tmp_name'];
 
+        if (empty($product_image)) {
+
+            $query = "SELECT product_image FROM products WHERE product_id = $product_id ";
+
+            $query = query($query);
+
+            confirm($query);
+
+            while($row = fetch_array($query)) {
+
+                $product_image = $row['product_image'];
+
+            }
+
+        }
+
+
+
         move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $product_image);
 
         $product_image = escape_string($product_image);
@@ -702,10 +787,51 @@ SQL;
 }
 
 
+function addCategory()
+{
+
+    if (isset($_POST['addcategory'])) {
+
+        $categoryTitle             = escape_string($_POST['category_title']);
+
+        $query = "
+INSERT INTO categories (cat_title) VALUES ('{$categoryTitle}') ";
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "Category added successfully");
+        redirect("index.php?categories");
+    }
+
+}
+
+
+
+function updateCategory()
+{
+
+    if (isset($_POST['update'])) {
+
+        $categoryId     = escape_string($_GET['id']);
+        $categoryTitle  = escape_string($_POST['category_title']);
+
+
+        $query = "UPDATE categories SET cat_title = '{$categoryTitle}' WHERE cat_id = {$categoryId} ";
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "Category updated successfully");
+        redirect("index.php?categories");
+    }
+
+}
+
+
 /**
- * @echo string
+ * @param $currentCategoryId
+ * @echo categories list with
  */
-function getCategoriesList()
+function getCategoriesList($currentCategoryId)
 {
     $query = "SELECT * FROM categories";
     $query = query($query);
@@ -716,7 +842,15 @@ function getCategoriesList()
         $categoryId = $row['cat_id'];
         $categoryTitle = $row['cat_title'];
 
-        $category = '<option value="' . $categoryId . '">' . $categoryTitle . '</option>';
+        $category = '<option value="' . $categoryId . '"';
+
+        if ($currentCategoryId == $categoryId) {
+
+            $category .= " selected";
+
+        }
+
+        $category .= '>' . $categoryTitle . '</option>';
 
         echo $category;
 
@@ -735,12 +869,9 @@ function getCategoriesList()
 function getCategoryNameById($categoryId)
 {
 
-
     $cat_title = "Not found";
 
-    $catId = $categoryId;
-
-    $categoryName = "SELECT cat_title FROM categories WHERE cat_id = $catId";
+    $categoryName = "SELECT cat_title FROM categories WHERE cat_id = $categoryId";
     $categoryName = query($categoryName);
     confirm($categoryName);
 
@@ -789,3 +920,37 @@ function pathToImage($frontendOrBackend, $imageNameFromDb)
     }
 }
 
+
+function displayReportsGrid() // backend: "view reports" grid.
+{
+    $query = "SELECT * FROM reports";
+
+    $query = query($query);
+
+    confirm($query);
+
+    while ($row = fetch_array($query)) {
+
+        $reportId     = $row['report_id'];
+        $orderId      = $row['order_id'];
+        $productTitle = $row['product_title'];
+        $productPrice = $row['product_price'];
+        $productQty   = $row['product_qty'];
+        $rawTotal = $productPrice * $productQty;
+
+        $report = <<<PRODUCT
+<tr>
+    <th>{$reportId}</th>
+    <th>{$orderId}</th>
+    <th>{$productTitle}</th>
+    <th>{$productPrice}</th>
+    <th>{$productQty}</th>
+    <th>{$rawTotal}</th>
+</tr>
+
+PRODUCT;
+
+        echo $report;
+
+    }
+}
