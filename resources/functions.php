@@ -177,6 +177,7 @@ function productsCount($categoryId)
 
     confirm($query);
 
+
     $productsQty = mysqli_num_rows($query);
 
     return $productsQty;
@@ -745,18 +746,24 @@ SQL;
 
 function addCategory()
 {
+    if (isset($_POST['addcategory']) && !null == $_POST['category_title']) {
 
-    if (isset($_POST['addcategory'])) {
+        $categoryTitle = escape_string($_POST['category_title']);
 
-        $categoryTitle             = escape_string($_POST['category_title']);
-
-        $query = "
-INSERT INTO categories (cat_title) VALUES ('{$categoryTitle}') ";
+        $query = "INSERT INTO categories (cat_title) VALUES ('{$categoryTitle}') ";
 
         $query = query($query);
+
         confirm($query);
+
         setMessage("success", "Category added successfully");
+
         redirect("index.php?categories");
+
+    } else {
+
+        setMessage("warning", "Category name can not be empty");
+
     }
 
 }
