@@ -84,50 +84,6 @@ function fetch_array($result)
 }
 
 
-function delete($entity, $entityId)
-{
-    switch ($entity) {
-
-        case "category":
-            $dbTable = "categories";
-            $columnName = "cat_id";
-            $redirectTo = "categories";
-            $entityName = "Category";
-            break;
-
-        case "product":
-            $dbTable = "products";
-            $columnName = "product_id";
-            $redirectTo = "products";
-            $entityName = "Product";
-            break;
-
-        case "order":
-            $dbTable = "orders";
-            $columnName = "oder_id";
-            $redirectTo = "orders";
-            $entityName = "Order";
-            break;
-    }
-
-        $query = "DELETE FROM {$dbTable} WHERE {$columnName} = $entityId ";
-
-        $query = query($query);
-
-    if (confirm($query)) {
-
-        setMessage("success",$entityName ." deleted.");
-
-    } else {
-
-        setMessage("warning",$entityName ." was not deleted.");
-
-    }
-
-    redirect("index.php?" . $redirectTo);
-
-}
-
 //get products
 
 function getProducts($categoryId) // on frontend, for category and index.
