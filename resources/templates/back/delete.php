@@ -28,6 +28,13 @@ if (isset($_GET['entity'])) {
             $redirectTo = "orders";
             $entityName = "Order";
             break;
+
+        case "user":
+            $dbTable = "users";
+            $columnName = "user_id";
+            $redirectTo = "users";
+            $entityName = "User";
+            break;
     }
 
 

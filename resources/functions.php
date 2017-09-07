@@ -917,3 +917,160 @@ PRODUCT;
 
     }
 }
+
+
+function displayUsers()
+{
+
+    $query = "SELECT * FROM users";
+
+    $query = query($query);
+
+    confirm($query);
+
+    $template_path = TEMPLATES;
+
+    while ($row = fetch_array($query)) {
+
+        $userId    = $row['user_id'];
+        $userName  = $row['user_name'];
+        $userEmail = $row['user_email'];
+        $userFname = $row['user_first_name'];
+        $userLname = $row['user_last_name'];
+        $userImage = $row['user_image'];
+
+        if (!empty($userImage)) {
+
+            $userImage = pathToImage("backend", $userImage);
+
+        } else {
+
+            $userImage = "http://placehold.it/60x60";
+        }
+
+        $users = <<<USER
+<tr>
+    <th>{$userId}</th>
+    <th>{$userName}</th>
+    <th><a href="index.php?edit_user&id={$userId}"><img src="{$userImage}" height="60px"></a></th>
+    <th>{$userEmail}</th>
+    <th>{$userFname}</th>
+    <th>{$userLname}</th>
+    <th>Edit</th>
+    <th><a class="btn btn-danger" href="{$template_path}/back/delete.php?entity=user&id={$userId}"><span class="glyphicon glyphicon-remove"></span></a></th>
+</tr>
+
+USER;
+
+        echo $users;
+
+    }
+
+}
+
+
+function addUser()
+{
+
+    if (isset($_POST['add_user'])) {
+
+        $userName             = escape_string($_POST['username']);
+        $userEmail       = escape_string($_POST['email']);
+        $userFname = escape_string($_POST['first_name']);
+        $userLname             = escape_string($_POST['last_name']);
+        $userPassword          = escape_string($_POST['password']);
+
+        $userImage       = $_FILES['file']['name'];
+        $image_temp_location = $_FILES['file']['tmp_name'];
+
+        move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $userImage);
+
+        $userImage = escape_string($userImage);
+
+        $query = <<<SQL
+INSERT INTO users (user_name
+                 , user_email
+                 , user_password
+                 , user_first_name
+                 , user_last_name
+                 , user_image
+                  ) 
+           VALUES ('{$userName}'
+                 , '{$userEmail}'
+                 , '{$userPassword}'
+                 , '{$userFname}'
+                 , '{$userLname}'
+                 , '{$userImage}'
+                  ) 
+SQL;
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "User added successfully");
+        redirect("index.php?users");
+    }
+
+}
+
+
+function updateUser()
+{
+
+    if (isset($_POST['update'])) {
+
+        $user_id                = escape_string($_GET['id']);
+        $user_title             = escape_string($_POST['user_title']);
+        $user_description       = escape_string($_POST['user_description']);
+        $user_short_description = escape_string($_POST['user_short_description']);
+        $user_price             = escape_string($_POST['user_price']);
+        $user_category          = escape_string($_POST['user_category']);
+        $user_quantity          = escape_string($_POST['user_quantity']);
+        $user_status            = escape_string($_POST['update']);
+        $user_status            = setuserStatus($user_status);
+
+        $user_image       = $_FILES['file']['name'];
+        $image_temp_location = $_FILES['file']['tmp_name'];
+
+        if (empty($user_image)) {
+
+            $query = "SELECT user_image FROM users WHERE user_id = $user_id ";
+
+            $query = query($query);
+
+            confirm($query);
+
+            while($row = fetch_array($query)) {
+
+                $user_image = $row['user_image'];
+
+            }
+
+        }
+
+
+
+        move_uploaded_file($image_temp_location, UPLOAD_DIRECTORY . DS . $user_image);
+
+        $user_image = escape_string($user_image);
+
+        $query = <<<SQL
+UPDATE users SET user_title             = '{$user_title}'
+                  , user_category_id       = '{$user_category}'
+                  , user_price             = '{$user_price}'
+                  , user_quantity          = '{$user_quantity}'
+                  , user_description       = '{$user_description}'
+                  , user_short_description = '{$user_short_description}'
+                  , user_image             = '{$user_image}'
+                  , user_status            = '{$user_status}' 
+WHERE user_id = {$user_id}
+SQL;
+
+
+
+        $query = query($query);
+        confirm($query);
+        setMessage("success", "user updated successfully");
+        redirect("index.php?users");
+    }
+
+}
