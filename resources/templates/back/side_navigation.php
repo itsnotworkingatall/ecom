@@ -27,10 +27,14 @@
             </li>
 
             <li>
-                <a href="index.php?categories"><i class="fa fa-fw fa-desktop"></i> Categories</a>
+                <a href="index.php?categories"><i class="fa fa-fw fa-sitemap"></i> Categories</a>
             </li>
             <li>
-                <a href="index.php?users"><i class="fa fa-fw fa-wrench"></i>Users</a>
+                <a href="index.php?users"><i class="fa fa-fw fa-group"></i> Users</a>
+            </li>
+
+            <li>
+                <a href="index.php?slides"><i class="fa fa-fw fa-image"></i> Slider</a>
             </li>
 
         </ul>
