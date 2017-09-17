@@ -311,7 +311,7 @@ function cart()
 
             if (substr($key, 0, 8) == "product_") {
 
-                $strlength = strlen($key - 8);
+                $strlength = strlen($key);
                 $id = substr($key, 8, $strlength);
                 $id = escape_string($id);
 

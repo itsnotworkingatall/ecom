@@ -1,12 +1,3 @@
-$(document).ready(function(){
-
-$('#demo').hover(
-  function () {
-    $(this).toggle();
-
- 
-});
-
-
-
+$(".btn-danger").click(function(){
+    return confirm("Really???");
 });
