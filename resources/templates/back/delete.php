@@ -13,6 +13,7 @@ if (isset($_GET['entity'])) {
             $columnName = "cat_id";
             $redirectTo = "categories";
             $entityName = "Category";
+            $entityImage = null;
             break;
 
         case "product":
@@ -20,6 +21,7 @@ if (isset($_GET['entity'])) {
             $columnName = "product_id";
             $redirectTo = "products";
             $entityName = "Product";
+            $entityImage = "product_image";
             break;
 
         case "order":
@@ -27,6 +29,7 @@ if (isset($_GET['entity'])) {
             $columnName = "order_id";
             $redirectTo = "orders";
             $entityName = "Order";
+            $entityImage = null;
             break;
 
         case "user":
@@ -34,6 +37,15 @@ if (isset($_GET['entity'])) {
             $columnName = "user_id";
             $redirectTo = "users";
             $entityName = "User";
+            $entityImage = "user_image";
+            break;
+
+        case "slider":
+            $dbTable = "slides";
+            $columnName = "slide_id";
+            $redirectTo = "slides";
+            $entityName = "Slide";
+            $entityImage = "slide_image";
             break;
     }
 
@@ -41,6 +53,24 @@ if (isset($_GET['entity'])) {
     if (isset($_GET['id'])) {
 
         $entityId = escape_string($_GET['id']);
+
+        if (!empty($entityImage)) {
+
+            $getImageFileName = "SELECT {$entityImage} FROM {$dbTable} WHERE {$columnName} = $entityId ";
+
+            $getImageFileName = query($getImageFileName);
+
+            confirm($getImageFileName);
+
+            while ($row = fetch_array($getImageFileName)) {
+
+                $imageFileName = $row[$entityImage];
+
+                $imageFileName = UPLOAD_DIRECTORY . DS . $imageFileName;
+
+                unlink($imageFileName);
+            }
+        }
 
         $query = "DELETE FROM {$dbTable} WHERE {$columnName} = $entityId ";
 

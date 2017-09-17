@@ -1074,3 +1074,174 @@ SQL;
     }
 
 }
+
+/* *************** slider *************** */
+
+function addSlides()
+{
+    if (isset($_POST['add_slide'])) {
+
+        $slideTitle    = escape_string($_POST['slide_title']);
+        $slideOrder    = escape_string($_POST['slide_order']);
+        $slideImage    = $_FILES['file']['name'];
+        $slideImageLoc = $_FILES['file']['tmp_name'];
+
+        if (empty($slideTitle) || empty($slideImage)) {
+
+            echo '<h1>Some field is empty</h1>>';
+
+        } else {
+
+            move_uploaded_file($slideImageLoc, UPLOAD_DIRECTORY . DS . $slideImage);
+
+            $slideImage = escape_string($slideImage);
+
+
+            $query = <<<SQL
+INSERT INTO slides (slide_title
+                  , slide_image
+                  , slide_order
+                  ) 
+           VALUES ('{$slideTitle}'
+                 , '{$slideImage}'
+                 , '{$slideOrder}'
+                  ) 
+SQL;
+
+
+            $query = query($query);
+            confirm($query);
+            setMessage("success", "Slide added");
+            redirect("index.php?slides");
+
+        }
+
+    }
+}
+
+
+
+function getActiveSlide()
+{
+
+}
+
+function getCurrentSlide ()
+{
+
+}
+
+function sliderNavigation ()
+{
+    $query = "SELECT * FROM slides WHERE slide_order >= 1 ";
+    $query = query($query);
+    confirm($query);
+
+    $rowsQty = mysqli_num_rows($query);
+    $slideNumber = 0;
+
+    while ($slideNumber < $rowsQty) {
+
+        $carousel = '<li data-target="#carousel-example-generic" data-slide-to="';
+
+        if ($slideNumber == 0) {
+
+            $carousel .= '0" class="active"></li>';
+
+        } else {
+
+            $carousel .= $slideNumber . '" </li>';
+
+        }
+
+        echo $carousel;
+
+        $slideNumber = $slideNumber + 1;
+
+    }
+}
+
+function getSlides()
+{
+    $query = "SELECT * FROM slides WHERE slide_order >= 1 ORDER BY slide_order ASC ";
+
+    $query = query($query);
+
+    confirm($query);
+
+    $slideCount = 1;
+
+    while($row = fetch_array($query)) {
+
+        $image = pathToImage("frontend", $row['slide_image'] );
+
+        if ($slideCount == 1) {
+
+            $divClass = "item active";
+
+        } else {
+
+            $divClass = "item";
+
+        }
+
+        $slideTitle = $row['slide_title'];
+
+$slides = <<<SLIDER
+
+<div class="{$divClass}">
+    <img class="slide-image" src="{$image}" alt="{$slideTitle}">
+</div>
+
+SLIDER;
+
+        echo $slides;
+
+        $slideCount = $slideCount + 1;
+
+    }
+}
+
+function displaySlidesGrid() {
+
+    $query = "SELECT * FROM slides ORDER BY slide_order ASC";
+
+    $query = query($query);
+
+    confirm($query);
+
+    $template_path = TEMPLATES;
+
+    while ($row = fetch_array($query)) {
+
+        $slideId = $row['slide_id'];
+        $slideTitle = $row['slide_title'];
+        $slideImage = $row['slide_image'];
+        $slideOrder = $row['slide_order'];
+
+        $slideImage = pathToImage("backend", $slideImage);
+
+        $tableRow = <<< TABLE
+
+<tr>
+    <td>{$slideId}</td>
+    <td>{$slideTitle}</td>
+    <td><img class="img-responsive" src="{$slideImage}" alt=""></td>
+    <td>{$slideOrder}</td>
+    <td><a class="btn btn-danger" href="{$template_path}/back/delete.php?entity=slider&id={$slideId}"><span class="glyphicon glyphicon-remove"></span></a></td>
+</tr>
+
+TABLE;
+
+        echo $tableRow;
+
+    }
+
+
+}
+
+
+function getSlideThumbs()
+{
+
+}

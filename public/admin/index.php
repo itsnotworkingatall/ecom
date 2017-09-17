@@ -105,6 +105,12 @@ if (isset($_GET['delete'])) {
 
 }
 
+if (isset($_GET['slides'])) {
+
+    include(TEMPLATE_BACK . DS . "slides.php");
+
+}
+
 ?>
 
 <?php include(TEMPLATE_BACK . DS . "footer.php") ?>
