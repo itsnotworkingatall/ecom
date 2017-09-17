@@ -89,7 +89,7 @@ function fetch_array($result)
 function getProducts($categoryId) // on frontend, for category and index.
 {
 
-    $query = "SELECT * FROM products ";
+    $query = "SELECT * FROM products WHERE product_quantity >= 1 ";
 
     if ($categoryId != null) {
         $query .= "WHERE product_category_id = {$categoryId} ";
